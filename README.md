@@ -21,6 +21,12 @@ its standard error is much smaller than the spread between seasons.
 
 Snapshot of results as of 2026-09-20; the current season is partial and the numbers move as matches are played.
 
+Dixon-Coles and Elo are statistically indistinguishable: the paired RPS difference (Dixon-Coles minus Elo) is
+-0.0003 on these 5,370 closing-odds matches (95% interval -0.0016 to +0.0011) and +0.0007 over all 8,790 scored
+matches (-0.0003 to +0.0017), so its sign flips with the subset. Rows are ordered by RPS, and the order should not
+be read as a ranking among models whose intervals overlap. Dixon-Coles is clearly better than independent Poisson,
+by 0.0020 on these 5,370 matches (-0.0027 to -0.0012). Source: `reports/paired_model_comparisons.csv`.
+
 Source: `reports/model_vs_market.csv` (written from the walk-forward predictions; the same numbers
 are in `reports/metrics.csv`). The market is Pinnacle's closing price for 5,150 of these matches and
 the market-average closing price for the other 220. On the 5,150 Pinnacle-only matches the picture is
@@ -28,8 +34,11 @@ the same: market 0.1930, Dixon-Coles 0.1993, Elo 0.1995, Poisson 0.2012, base ra
 
 ![Gap to the market](reports/figures/rps_gap_to_market.png)
 
-The best statistical model is about 0.006 RPS behind the closing line. The market was better in 14
-of the 15 seasons 2012/13 to 2026/27; the exception is 2026/27, which only has 50 matches so far.
+The best statistical model is about 0.006 RPS behind the closing line. The market beat every statistical model in
+all 14 complete seasons (2012/13 to 2025/26). Each season the comparison is against whichever of the four models
+scored best that season (Dixon-Coles in nine of them, Elo in four, Poisson in one), so it is the hardest comparison
+available; the narrowest margin is 0.0007 RPS, in 2019/20. 2026/27 has only 50 matches so far and is too small to call.
+Source: `reports/rps_by_season.csv`.
 
 ## Evaluation method
 
@@ -69,8 +78,8 @@ information. RPS 0.2287 over all 8,790 scored matches. It is the floor.
 **Elo.** Ratings start at 1500 and update after every match, with the step size K scaled up for bigger
 margins (1x for a one-goal win, 1.5x for two, then (11 + margin) / 8). Elo gives an expected score, not a
 draw probability, so an ordered logit maps the rating gap to home / draw / away, refitted with the ratings
-from past matches only. This step is worth 0.030 RPS over the base rate (0.2287 to 0.1982 over all scored
-matches). The K curve is flat near its minimum (K = 15, 20 and 25 differ by 0.0001), so the exact value is
+from past matches only. This step is worth 0.030 RPS over the base rate (0.2287 to 0.1982, all 8,790 scored
+matches). The K curve is flat near its minimum (K = 15, 20 and 25 differ by 0.0001 RPS, all 8,790 scored matches), so the exact value is
 not important.
 
 ![Elo K tuning](reports/figures/elo_k_tuning.png)
@@ -80,7 +89,8 @@ level, a home-advantage term and one attack and one defence parameter per club (
 to zero so the model is identified), fitted by maximum likelihood on a rolling window of recent seasons. It
 produces a full 8 x 8 table of scoreline probabilities; home / draw / away, over/under, both-teams-to-score
 and Asian handicap prices are all sums over that one table, so they cannot disagree with each other. A window
-of about two years is best (curve below). On 1X2 it is slightly worse than Elo (RPS 0.2004 against 0.1982):
+of about two years is best (curve below, all 8,790 scored matches). On 1X2 it is slightly worse than Elo (RPS 0.2004 against 0.1982,
+all 8,790 scored matches):
 modelling goals rather than results buys nothing on its own.
 
 ![Poisson lookback tuning](reports/figures/poisson_lookback_tuning.png)
@@ -94,11 +104,12 @@ the `penaltyblog` package (a test-only reference, never imported by `src/`) to 1
 ![Dixon-Coles xi tuning](reports/figures/dc_xi_tuning.png)
 
 The xi curve is U-shaped: no decay scores 0.2014, the minimum is flat between xi = 0.0018 and 0.0025 per day
-(0.19891 and 0.19886; half-lives of about 385 and 280 days, so roughly a year of memory) and the curve rises
+(0.19891 and 0.19886; all values here on the 8,790 scored matches; half-lives of about 385 and 280 days, so roughly a year of memory) and the curve rises
 again at 0.005, where too little data remains. The out-of-sample choice picks 0.0018 in 21 of 24 seasons
 and 0.0025 in three. Paired over the same matches, time decay and tau together improve on independent Poisson by
-0.0014 RPS (standard error 0.0003), a clear gain. Against Elo it is 0.0007 worse over all scored matches
-(standard error 0.0005), which is a tie.
+0.0014 RPS over all 8,790 scored matches (standard error 0.0003) and by 0.0020 on the 5,370 closing-odds matches
+(standard error 0.0004), a clear gain on both. Against Elo it is 0.0007 worse over all 8,790 scored matches
+(standard error 0.0005) and 0.0003 better on the 5,370 closing-odds matches (standard error 0.0007): a tie.
 
 **Goals markets for free.** Because Dixon-Coles and Poisson produce a scoreline table, they also price
 over/under 2.5. On the 2,710 matches from 2019/20 with closing over/under prices (de-vigged
@@ -108,9 +119,8 @@ Poisson model has no edge over the base rate there; Dixon-Coles has a small one;
 
 ![Dixon-Coles against the market](reports/figures/scatter_dixon_coles_vs_market.png)
 
-The two models agree on direction (correlation 0.92 on home-win probability) but the model's probabilities
-are noisier around the market's, which is what estimating 20 clubs' strengths from a year or two of results
-looks like.
+The two models agree on direction (correlation 0.92 on home-win probability, 5,370 closing-odds matches) but the model's
+probabilities scatter widely around the market's.
 
 ## Calibration and recalibration
 
@@ -128,19 +138,20 @@ Expected calibration error per outcome, on the same 5,370 matches:
 
 ![Dixon-Coles calibration](reports/figures/calibration_dixon_coles.png)
 
-The models are not badly miscalibrated; they are less sharp than the market, which is a discrimination gap
-rather than a calibration one. That explains the result of the recalibration test. For each season, one
+The models are not badly miscalibrated, and the recalibration test below shows that fixing what miscalibration
+there is does not close the gap to the market. For each season, one
 isotonic map per outcome was fitted on the out-of-sample predictions of earlier seasons only (at least two),
-applied to that season, and the rows renormalised. **It did not help any model**: RPS got slightly worse for
-all five (Dixon-Coles +0.0004, Elo +0.0007, Poisson +0.0002, market +0.0015 and base rate +0.0018; standard
-errors 0.0002 to 0.0004), so the gaps to the market above are not a calibration problem. The table is
+applied to that season, and the rows renormalised. **It did not help any model**: out-of-sample RPS got slightly worse for
+all five (the four models scored on 8,030 matches from 2005/06 onwards, the market on 4,610 from 2014/15 onwards;
+Dixon-Coles +0.0004, Elo +0.0007, Poisson +0.0002, market +0.0015 and base rate +0.0018; standard
+errors 0.0002 to 0.0004), so the gaps to the market above do not look like a calibration problem. The table is
 `reports/recalibration.csv`. The market's own predictions get worse when recalibrated because they were
 already well calibrated and the isotonic map only adds noise.
 
 ![RPS by season](reports/figures/rps_by_season.png)
 
-Season by season, the RPS of every model swings between roughly 0.18 and 0.22 because of how results fell,
-which is far larger than the 0.006 gap between the best model and the market. The models rise and fall
+Season by season, the RPS of every model swings between roughly 0.18 and 0.225 from one season to the next (`reports/rps_by_season.csv`),
+which is far larger than the 0.006 gap between the best model and the market. The models and the market rise and fall
 together, which is why the paired comparison is the right one.
 
 ## Known limitations
@@ -161,10 +172,11 @@ together, which is why the paired comparison is the right one.
 - **Lookback and xi were tuned separately.** Dixon-Coles' window is fixed at five years; a check at the best
   xi shows 3, 5 and 8 years within 0.0003 RPS (`reports/dc_lookback_sensitivity.csv`, descriptive only).
 - **Home advantage in Elo is a fixed 65 points**, not estimated.
-- **No profit analysis, deliberately.** The closing line is not beatable with these inputs: every model
-  trails it on proper scoring rules, and a bookmaker's closing price is typically the most informed price available.
-  A simulated return at closing odds would also be meaningless, since no one can bet at a closing price
-  that only exists once the market is shut; so no ROI, yield or staking result is computed anywhere here.
+- **No profit analysis, deliberately.** No model here beats the closing line on any proper scoring rule, so there
+  is no basis for a profit claim, and no edge was found. A simulated return at closing odds would also be
+  misleading: you cannot know in advance which quote will be the last one, the closing price absorbs information
+  that arrives after any realistic betting time, and the quoted price may not be available at size (Pinnacle limits,
+  retail availability and account restrictions). So no ROI, yield or staking result is computed anywhere here.
 
 ## Reproduction
 

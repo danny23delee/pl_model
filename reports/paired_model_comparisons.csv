@@ -1,0 +1,5 @@
+model_a,model_b,subset,n,rps_a,rps_b,rps_diff_a_minus_b,se,ci95_low,ci95_high,config_hash
+dixon_coles,elo,all_scored,8790,0.198926,0.198246,0.000679,0.000524,-0.000347,0.001706,2f9bdfc7ecc7
+dixon_coles,elo,closing_any,5370,0.199958,0.200218,-0.000260,0.000693,-0.001618,0.001098,2f9bdfc7ecc7
+dixon_coles,poisson,all_scored,8790,0.198926,0.200368,-0.001442,0.000268,-0.001968,-0.000916,2f9bdfc7ecc7
+dixon_coles,poisson,closing_any,5370,0.199958,0.201909,-0.001951,0.000370,-0.002676,-0.001226,2f9bdfc7ecc7

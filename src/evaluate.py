@@ -480,6 +480,31 @@ def plot_vs_market_scatter(model: str, p_model: np.ndarray, p_market: np.ndarray
     return r
 
 
+def report_paired_comparisons(preds: dict[str, pd.DataFrame], cfg: dict) -> pd.DataFrame:
+    """Paired RPS differences between model pairs, on the full scored set and on the
+    closing-odds subset, with 95% intervals. Written to reports/paired_model_comparisons.csv."""
+    h = config_hash(cfg)
+    subsets = {"all_scored": None, "closing_any": preds["market"][KEY]}
+    rows = []
+    for a, b in [("dixon_coles", "elo"), ("dixon_coles", "poisson")]:
+        for name, keys in subsets.items():
+            pa, pb_ = preds[a], preds[b]
+            if keys is not None:
+                pa, pb_ = pa.merge(keys, on=KEY), pb_.merge(keys, on=KEY)
+            pa = pa.sort_values(KEY, kind="stable").reset_index(drop=True)
+            pb_ = pb_.sort_values(KEY, kind="stable").reset_index(drop=True)
+            assert (pa[KEY].to_numpy() == pb_[KEY].to_numpy()).all()
+            y = encode_outcome(pa["ftr"])
+            diff, se = paired_gap(pa[PRED_COLS].to_numpy(), pb_[PRED_COLS].to_numpy(), y)
+            rows.append({"model_a": a, "model_b": b, "subset": name, "n": len(y),
+                         "rps_a": rps(pa[PRED_COLS].to_numpy(), y), "rps_b": rps(pb_[PRED_COLS].to_numpy(), y),
+                         "rps_diff_a_minus_b": diff, "se": se, "ci95_low": diff - 1.96 * se,
+                         "ci95_high": diff + 1.96 * se, "config_hash": h})
+    out = pd.DataFrame(rows)
+    out.to_csv(ROOT / "reports" / "paired_model_comparisons.csv", index=False, float_format="%.6f")
+    return out
+
+
 def report_models(cfg: dict | None = None) -> None:
     """M7 outputs: model-vs-market table, calibration curves and ECE for every model,
     RPS-by-season, gap-to-market, scatter plots, isotonic recalibration test."""
@@ -519,6 +544,7 @@ def report_models(cfg: dict | None = None) -> None:
         if name in cl:
             plot_vs_market_scatter(name, cl[name]["p_home"].to_numpy(), cl["market"]["p_home"].to_numpy(),
                                    figs / f"scatter_{name}_vs_market.png")
+    report_paired_comparisons(preds, cfg)
     report_recalibration(preds, cfg)
 
 

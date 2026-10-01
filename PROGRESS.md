@@ -181,3 +181,43 @@ information, and the closing-odds subset.
 - Editing `config.yaml` changes the config hash and therefore every metrics row; rerun `make all` after any
   change to it (none pending).
 - Scope left untouched as the brief requires: no P&L, no other leagues, no xG, no corners or cards.
+
+## Pre-publication fixes (items 1-4): done (2026-10-01)
+
+**Item 1, CI and portability.** Read the Makefile and scripts for Windows-isms: none (no backslash paths, no
+cmd-style commands, `if __name__` guard present around the multiprocessing entry point). Changes: parallel worker
+count is now `PL_WORKERS` or `os.cpu_count()` (`PL_WORKERS=1` runs serially); `requirements.txt` pinned to the
+tested versions and now lists `scikit-learn`, which the tests import but was missing; `.github/workflows/ci.yml`
+added (Ubuntu, Python 3.11, pip cache, `make all`, informational `git diff --stat -- reports/`, `reports/` uploaded
+as an artifact, `workflow_dispatch` plus push to `main` ignoring markdown, concurrency cancel-in-progress, 300
+minute timeout). A test I wrote in M6 hard-coded the scored-match count (8790) and would have failed on any fresh run
+because the current season keeps growing; it now compares with the live data (a wrong test, fixed here as the brief
+requires). README gains the snapshot line (2026-09-20, the most recent match in the data). The Python 3.10 / no-`make`
+caveat stays until CI is green.
+
+**Item 2, ordering and subsets.** New `reports/paired_model_comparisons.csv` (via the existing `paired_gap` helper,
+now also called from `report_models`). Confirmed from stored predictions: Dixon-Coles minus Elo is +0.0007
+(SE 0.0005) over all 8,790 scored matches, matching the README, and -0.0003 (SE 0.0007, 95% interval -0.0016 to
++0.0011) on the 5,370 closing-odds matches, so the sign flips and the two are indistinguishable; sentence added under
+the headline table. The Dixon-Coles vs Poisson gain (0.0014, SE 0.0003) was computed ad hoc in M6 and not stored; it
+is now in the CSV (all 8,790: -0.0014; closing 5,370: -0.0020). Subset audit: every RPS figure in the model ladder is
+on the 8,790 scored matches except where now labelled otherwise (the base-rate, Elo, Poisson, xi-curve, K-curve and
+0.030 figures were all verified against `metrics.csv` and `tuning_*.csv`). Three sentences were wrong or unlabelled
+and were rewritten, not the numbers: the recalibration result mixed subsets (the four models are on 8,030 matches from
+2005/06, the market on 4,610 from 2014/15; now stated); "swings between roughly 0.18 and 0.22" (the per-season table
+reaches 0.225); and two interpretive claims with no computed backing ("less sharp than the market", "noisier ... which is
+what estimating 20 clubs' strengths looks like") were softened to what the tables show.
+
+**Item 3, closing-price reasoning.** The profit bullet is rewritten: no model beats the closing line on any proper scoring
+rule so there is no basis for a profit claim; reasons a closing-odds simulation would mislead are that the last quote cannot
+be known in advance, the closing price absorbs later information, and the price may not be available at size. It says "no
+edge found here". No other absolute wording about market efficiency was found in the README.
+
+**Item 4, season count.** From `reports/rps_by_season.csv`: the market beat the best of the other four models in every one
+of the 14 complete seasons (2012/13 to 2025/26), smallest margin 0.0007 (2019/20). The best model per season is Dixon-Coles
+nine times, Elo four, Poisson once. 2026/27 has 50 matches and is called too small.
+
+**Publishing.** `git init` was run in this session (the folder was not a repository); the baseline commit is the v1 build.
+`CLAUDE.md` and `CLAUDE_FIXES.md` are working instructions for the assistant, mention a private odds-collection tool and
+the owner's job search, and are excluded locally (`.git/info/exclude`), not published. `data/predictions/` was missing from
+`.gitignore` and is now ignored. CI result: see below (not recorded in this session; `gh` is not installed here).
