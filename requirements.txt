@@ -1,0 +1,8 @@
+pandas
+numpy
+scipy
+matplotlib
+pyarrow
+pyyaml
+pytest
+penaltyblog  # tests only: reference implementation for cross-checks, never imported by src/

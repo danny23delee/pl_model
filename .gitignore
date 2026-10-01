@@ -1,0 +1,11 @@
+data/raw/
+data/clean/
+data/features/
+data/predictions/
+artifacts/
+.env
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+*.pyc

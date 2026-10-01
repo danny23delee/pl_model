@@ -1,0 +1,5 @@
+model,subset,n,log_loss,brier,config_hash
+base_rate_ou25,ou25_closing,2710,0.691620,0.249236,2f9bdfc7ecc7
+dixon_coles,ou25_closing,2710,0.684968,0.245562,2f9bdfc7ecc7
+market_ou25,ou25_closing,2710,0.673382,0.240292,2f9bdfc7ecc7
+poisson,ou25_closing,2710,0.692102,0.248418,2f9bdfc7ecc7

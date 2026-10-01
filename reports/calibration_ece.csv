@@ -1,0 +1,16 @@
+model,outcome,ece,n
+market,home,0.014030,5370
+market,draw,0.004166,5370
+market,away,0.009078,5370
+dixon_coles,home,0.016108,5370
+dixon_coles,draw,0.008803,5370
+dixon_coles,away,0.015462,5370
+elo,home,0.020885,5370
+elo,draw,0.008104,5370
+elo,away,0.026894,5370
+poisson,home,0.013316,5370
+poisson,draw,0.011089,5370
+poisson,away,0.016249,5370
+baserate,home,0.018081,5370
+baserate,draw,0.014086,5370
+baserate,away,0.032168,5370

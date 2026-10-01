@@ -1,0 +1,40 @@
+data:
+  league: E0
+  first_season: 2000
+  base_url: https://www.football-data.co.uk/mmz4281
+  raw_dir: data/raw
+  clean_path: data/clean/matches.parquet
+  teams_path: config/teams.json
+
+backtest:
+  burn_in_seasons: 3
+  retrain_frequency: matchweek
+  min_closing_odds_season: 2012   # first season with Pinnacle closing (PSCH); verified in M1, see DATA_NOTES.md
+
+market:
+  primary: PSC        # Pinnacle closing
+  fallback: AvgC      # market average closing
+  devig: proportional # proportional | shin
+
+models:
+  elo:
+    k_grid: [10, 15, 20, 25, 30, 40]
+    k_default: 20        # used only for the first scored season, before any out-of-sample evidence exists
+    initial_rating: 1500
+    home_advantage: 65   # Elo points added to the home side in the expected-score calculation
+    goal_diff_adjustment: true
+  poisson:
+    lookback_grid: [1, 2, 3, 4, 5, 8]   # years of history used per fit
+    lookback_default: 3                # used only for the first scored season
+    max_goals: 8
+  dixon_coles:
+    xi_grid: [0.0, 0.0005, 0.001, 0.0018, 0.0025, 0.005]
+    max_goals: 8
+    xi_default: 0.0018       # used only for the first scored season; xi is per day
+    lookback_years: 5        # weights beyond this are <4% at xi >= 0.0018; sensitivity in reports/
+    lookback_sensitivity: [3, 5, 8]
+
+evaluate:
+  primary_metric: rps
+  calibration_bins: 10
+  seed: 42
