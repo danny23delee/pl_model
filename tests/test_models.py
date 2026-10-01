@@ -568,4 +568,8 @@ def test_dc_backtest_outputs_and_ranking():
     assert get("dixon_coles") < get("baserate")
     assert (root / "reports" / "figures" / "dc_xi_tuning.png").exists()
     curve = pd.read_csv(root / "reports" / "tuning_dixon_coles.csv")
-    assert list(curve["xi"]) == CFG["models"]["dixon_coles"]["xi_grid"] and (curve["n"] == 8790).all()
+    assert list(curve["xi"]) == CFG["models"]["dixon_coles"]["xi_grid"]
+    # the data is live (the current season grows), so compare with the data rather than a constant
+    from clean import load_clean
+    n_scored = (load_clean()["season"] >= load_clean()["season"].min() + CFG["backtest"]["burn_in_seasons"]).sum()
+    assert (curve["n"] == n_scored).all()

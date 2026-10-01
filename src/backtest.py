@@ -95,7 +95,11 @@ def _parallel(fn, args: list) -> list:
     the config files and data on disk, so the output does not depend on scheduling."""
     from concurrent.futures import ProcessPoolExecutor
     import os
-    with ProcessPoolExecutor(max_workers=max(1, min(len(args), os.cpu_count() or 1))) as pool:
+    cap = int(os.environ.get("PL_WORKERS", os.cpu_count() or 1))   # set PL_WORKERS=1 to run serially
+    workers = max(1, min(len(args), cap))
+    if workers == 1:
+        return [fn(a) for a in args]
+    with ProcessPoolExecutor(max_workers=workers) as pool:
         return list(pool.map(fn, args))
 
 

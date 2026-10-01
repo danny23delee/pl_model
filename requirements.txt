@@ -1,8 +1,10 @@
-pandas
-numpy
-scipy
-matplotlib
-pyarrow
-pyyaml
-pytest
-penaltyblog  # tests only: reference implementation for cross-checks, never imported by src/
+pandas==2.2.3
+numpy==2.2.5
+scipy==1.15.3
+matplotlib==3.10.5
+pyarrow==24.0.0
+PyYAML==6.0.3
+pytest==9.1.1
+# tests only: reference implementations for cross-checks, never imported by src/
+penaltyblog==1.12.3
+scikit-learn==1.7.2

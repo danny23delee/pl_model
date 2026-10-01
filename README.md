@@ -19,6 +19,8 @@ its standard error is much smaller than the spread between seasons.
 | Independent Poisson | 0.2019 | 0.9845 | 0.5837 | +0.0082 (+/- 0.0018) |
 | Base rate (historical H / D / A frequencies) | 0.2322 | 1.0690 | 0.6466 | +0.0385 (+/- 0.0038) |
 
+Snapshot of results as of 2026-09-20; the current season is partial and the numbers move as matches are played.
+
 Source: `reports/model_vs_market.csv` (written from the walk-forward predictions; the same numbers
 are in `reports/metrics.csv`). The market is Pinnacle's closing price for 5,150 of these matches and
 the market-average closing price for the other 220. On the 5,150 Pinnacle-only matches the picture is
