@@ -2,6 +2,12 @@
 
 ![CI](https://github.com/danny23delee/pl_model/actions/workflows/ci.yml/badge.svg)
 
+## In plain English
+
+I built five models that forecast Premier League results and tested them honestly, predicting every match using only earlier matches, against the bookmakers' closing prices (their final odds before kick-off). None beats the market: on 5,370 matches (snapshot of 2026-09-20) the best model recovers 84% of the distance between a no-information guess (always quoting the historical home / draw / away frequencies) and the market, on a standard score for probability forecasts, so the last 16% of that distance was never closed. The point of the repository is being able to show how I know that, through leakage tests and paired comparisons, not claiming an edge.
+
+## Overview
+
 A probabilistic model of Premier League results (home / draw / away), judged by a walk-forward
 backtest and benchmarked against de-vigged bookmaker closing prices. The deliverable is the
 evaluation harness, with five models plugged into it. **None of them beats the market, and the
@@ -179,6 +185,17 @@ together, which is why the paired comparison is the right one.
   misleading: you cannot know in advance which quote will be the last one, the closing price absorbs information
   that arrives after any realistic betting time, and the quoted price may not be available at size (Pinnacle limits,
   retail availability and account restrictions). So no ROI, yield or staking result is computed anywhere here.
+
+## Roadmap
+
+Planned, not built. All of it would use public data only, and none of it promises a result.
+
+- **Corners and cards.** Count models for corners (Poisson against negative binomial) and a referee effect for cards, since the referee is in the same football-data.co.uk files and is known before kick-off. These would be judged on calibration and fit, not against a market price, because no free historical odds source exists for these markets.
+- **More leagues.** Run the same pipeline on other football-data.co.uk leagues to test whether the Premier League hyperparameters transfer or are overfit to Premier League quirks.
+- **Promoted-team cold start.** Measure the error on promoted clubs' first ten or so matches against everything else, then test a promoted-team prior.
+- **Elo between-season regression to the mean.** Ratings currently carry over unchanged; test pulling them back toward 1500 between seasons.
+- **Timestamped odds snapshots.** Collect public pre-match prices over time, going forward, to test whether a model's disagreement with the opening price predicts later price movement.
+- **Weekly forecasts.** Automated predictions for upcoming fixtures, published with a public track record.
 
 ## Reproduction
 
