@@ -1,5 +1,7 @@
 # Premier League match prediction, evaluated against the market
 
+![CI](https://github.com/danny23delee/pl_model/actions/workflows/ci.yml/badge.svg)
+
 A probabilistic model of Premier League results (home / draw / away), judged by a walk-forward
 backtest and benchmarked against de-vigged bookmaker closing prices. The deliverable is the
 evaluation harness, with five models plugged into it. **None of them beats the market, and the
@@ -193,7 +195,7 @@ Dixon-Coles sweep their tuning grids in parallel worker processes) and writes `r
 on the order of an hour on a multi-core machine (not precisely timed). Individual steps: `make data`, `make market`,
 `make backtest MODEL=elo` (baserate, elo, poisson, dixon_coles or market), `make report`, `make test`.
 
-Notes: the code was run and tested on Python 3.10 on Windows (the brief asks for 3.11+; nothing 3.11-specific is
-used). `make` was not available on that machine, so the Makefile's recipes were run as the same commands in the
-same order rather than through `make` itself. Other files: `DATA_NOTES.md` (schemas, per-season column coverage,
-every data quirk), `PROGRESS.md` (what was built and verified at each milestone).
+CI runs the full pipeline (make all) on Ubuntu with Python 3.11 on every push to main.
+
+Other files: `DATA_NOTES.md` (schemas, per-season column coverage, every data quirk), `PROGRESS.md` (what was built and
+verified at each milestone).

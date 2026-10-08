@@ -220,4 +220,21 @@ nine times, Elo four, Poisson once. 2026/27 has 50 matches and is called too sma
 **Publishing.** `git init` was run in this session (the folder was not a repository); the baseline commit is the v1 build.
 `CLAUDE.md` and `CLAUDE_FIXES.md` are working instructions for the assistant, mention a private odds-collection tool and
 the owner's job search, and are excluded locally (`.git/info/exclude`), not published. `data/predictions/` was missing from
-`.gitignore` and is now ignored. CI result: see below (not recorded in this session; `gh` is not installed here).
+`.gitignore` and is now ignored. CI result: see the Phase 2 entry below.
+
+## CI verification and publication (Phase 2): done (2026-10-08)
+
+**CI:** run 36847404560 on `main` (commit f9ca8a2, the first push) finished green: Ubuntu, Python 3.11, `make all`
+(download, clean, every backtest, report, 118 tests), about 91 minutes (2026-10-01 10:10 to 11:41 UTC). This closes
+item 1: `make all` has now run from a clean checkout on Linux, so the earlier caveat that the Makefile and Python 3.11
+were untested no longer applies and has been removed from the README, which now carries the CI badge.
+
+**Linux-specific fixes needed:** none after the push. The three changes that mattered for a clean Linux run were
+made before it (pinned `requirements.txt` including the missing `scikit-learn`, the configurable worker count, and
+the test that hard-coded the scored-match count) and the first run passed without further changes.
+
+**Not checked:** the informational `git diff --stat -- reports/` step and the uploaded `reports/` artifact were not
+inspected (no authenticated access to the logs from the dev machine), so whether Linux float or font rendering
+changed any committed report file is unknown. The README states results as a dated snapshot; CI asserts none of its numbers.
+
+**Items 1-4 status:** all verified as described in the previous entry.
